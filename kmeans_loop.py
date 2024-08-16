@@ -20,7 +20,7 @@ num_clusters = 30
 how_many_files_to_generate = 50
 
 """
- Possibly change weights for the indivual parts of the total fingerprint. CrystalNN has 244 elements, 
+ Possibly change weights for the individual parts of the total fingerprint. CrystalNN has 244 elements, 
  then 4 elements for difference in local atomic masses, 4 elements for average bond distances, and 100 elements for RDF up to 10 A 
 """
 weight_crystalNN = 1
