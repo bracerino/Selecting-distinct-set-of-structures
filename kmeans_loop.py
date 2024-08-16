@@ -1,17 +1,13 @@
 import pickle
 import numpy as np
 import seaborn as sns
-import matplotlib.pyplot as plt
 from sklearn.cluster import KMeans
-from sklearn.metrics import silhouette_score, davies_bouldin_score
 from scipy.spatial.distance import cdist, euclidean
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import MinMaxScaler
 import numpy as np
-import seaborn as sns
 import matplotlib.pyplot as plt
-
 from sklearn.manifold import TSNE
 
 # ---------------- USER INPUT ----------------
@@ -96,8 +92,6 @@ keywords_file = 'files_with_large_vectors.txt'  # Replace 'keywords.txt' with yo
 remove_keywords_from_dict(database, keywords_file)
 """
 
-
-print(size_of_groups)
 def extract_number(key):
     parts = key.split('_')
     return int(parts[-1]) if len(parts) > 1 and parts[-1].isdigit() else 0
@@ -112,6 +106,8 @@ print(f"Total number of loaded structures:       {len(names)}")
 
 ikx = 0
 while ikx < how_many_files_to_generate:
+    print('\n--------------------------------------------------------')
+    print("Started to preparing file number {}/{} with total {} atomic configurations selected.".format(ikx,how_many_files_to_generate, num_clusters))
     names = list(database.keys())
     fingerprints = np.array(list(database.values()))
     scaler = StandardScaler()
@@ -169,7 +165,7 @@ while ikx < how_many_files_to_generate:
         sorted_structure_names = sorted(selected_structures, key=extract_number)
         with open('selected_structure_names_PCA_{}.txt'.format(ikx), 'w') as file:
             file.writelines(name + '.xml\n' for name in sorted_structure_names)
-        print("Done.")
+    print('Done\n-------------------------------------------------------')
 
 
 
@@ -196,6 +192,4 @@ while ikx < how_many_files_to_generate:
         for value1, value2 in zip(other_names_possibly_add, sorted_values):
             f0.write(f'{value1}\t{value2}\n')
     """
-
-
     ikx = ikx + 1
