@@ -11,8 +11,12 @@ chem_info2 = {
     }
 }
 
+input_folder = Vacancies_2
+output_name_dictionary = dict_VACA_2.pkl
+
+
 start_time = time.time()
-calculator = StructureFingerprintCalculator('Vacancies_2/', 'dict_VACA_2.pkl', chem_info2)
+calculator = StructureFingerprintCalculator(input_folder, output_name_dictionary, chem_info2)
 calculator.process_structures()
 
 end_time = time.time()  # End# timing
