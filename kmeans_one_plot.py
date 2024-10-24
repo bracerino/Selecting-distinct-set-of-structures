@@ -149,35 +149,41 @@ part2_indices = range(244, 248)  # Next 4 elements
 part3_indices = range(248, 252)  # Next 4 elements
 part4_indices = range(252, 352)  # Last 100 elements
 
-# Create the plot
+
+all_indices = np.concatenate([part1_indices, part2_indices, part3_indices, part4_indices])
+all_contributions = np.concatenate([contribution_vector_85[part1_indices],
+                                     contribution_vector_85[part2_indices],
+                                     contribution_vector_85[part3_indices],
+                                     contribution_vector_85[part4_indices]])
+
+# Create the color mapping for each segment
+colors = ['b'] * len(part1_indices) + ['g'] * len(part2_indices) + ['r'] * len(part3_indices) + ['m'] * len(part4_indices)
+
+# Create the bar graph
 plt.figure(figsize=(16, 12))
+plt.bar(all_indices, all_contributions, color=colors)
 
-# Plot each segment with a different color
-plt.scatter(part1_indices, contribution_vector_85[part1_indices], marker='o', linestyle='-', color='b', label='CrystalNN\n(0-243)')
-plt.scatter(part2_indices, contribution_vector_85[part2_indices], marker='o', linestyle='-', color='g', label='Atomic mass difference\n(244-247)')
-plt.scatter(part3_indices, contribution_vector_85[part3_indices], marker='o', linestyle='-', color='r', label='Pair bond distances\n(248-251)')
-plt.scatter(part4_indices, contribution_vector_85[part4_indices], marker='o', linestyle='-', color='m', label='RDF\n(252-351)')
 
-# Add labels and title
 plt.xlabel('Feature Index', fontsize=25)
 plt.ylabel('Contributions to 98% of Explained Variance', fontsize=25)
 plt.title('Feature Contribution to the First 85 PCA Components', fontsize=25)
 
-# Add a legend to distinguish parts
-plt.legend(fontsize = 16)
 
-# Show grid for better readability
-#plt.grid(True)
+from matplotlib.patches import Patch
+legend_handles = [
+    Patch(color='b', label='CrystalNN\n(0-243)'),
+    Patch(color='g', label='Atomic mass difference\n(244-247)'),
+    Patch(color='r', label='Pair bond distances\n(248-251)'),
+    Patch(color='m', label='RDF\n(252-351)')
+]
+plt.legend(handles=legend_handles, fontsize=16)
 
+plt.grid(True)
 
 plt.xticks(fontsize=25)
 plt.yticks(fontsize=25)
 
-# Display the plot
 plt.show()
-
-
-
 
 
 
@@ -190,9 +196,6 @@ fingerprints=principal_components
 from mpl_toolkits.mplot3d import Axes3D
 print("PCA done.")
 #----------------------------------------------------------------
-
-
-
 
 
 
@@ -292,4 +295,42 @@ for cluster in range(num_clusters):
         closest_point_index = indices[np.argmin([euclidean(fingerprints[idx], centroids[cluster]) for idx in indices])]
         ax2.scatter(tsne_results[closest_point_index, 0], tsne_results[closest_point_index, 1],
                    s=300,color='black', alpha=0.5)
+plt.show()
+
+
+# For 3D t-SNE
+tsne_3d = TSNE(n_components=3, random_state=0, perplexity=30)
+tsne_3d_results = tsne_3d.fit_transform(principal_components)
+
+fig_3d = plt.figure(figsize=(10, 8))
+ax3 = fig_3d.add_subplot(111, projection='3d')
+previous_val = 0
+for idx, val in enumerate(size_of_groups):
+    indecis_to_plot = val + previous_val
+    indecis = range(previous_val, indecis_to_plot)
+    previous_val = indecis_to_plot
+
+    if idx == 0:
+        sc = ax3.scatter(tsne_3d_results[indecis, 0], tsne_3d_results[indecis, 1], tsne_3d_results[indecis, 2],
+                         label=list_of_files_names[idx], alpha=1, s=100, c=color_map[idx], cmap=map_type[idx], marker=markers[idx])
+        cbar = plt.colorbar(sc, ax=ax3)
+    else:
+        sc = ax3.scatter(tsne_3d_results[indecis, 0], tsne_3d_results[indecis, 1], tsne_3d_results[indecis, 2],
+                         label=list_of_files_names[idx], alpha=1, s=100, c=color_map[idx], cmap=map_type[idx], marker=markers[idx])
+
+cbar.set_label('Color Scale of % lattice deformation', fontsize=15)
+ax3.set_title('3D t-SNE visualization of PCA-transformed data', fontsize=15)
+ax3.set_xlabel('t-SNE feature 1', fontsize=15)
+ax3.set_ylabel('t-SNE feature 2', fontsize=15)
+ax3.set_zlabel('t-SNE feature 3', fontsize=15)
+
+# Highlight closest points to the centroids for each cluster
+for cluster in range(num_clusters):
+    indices = np.where(labels == cluster)[0]
+    if len(indices) > 0:
+        closest_point_index = indices[np.argmin([euclidean(fingerprints[idx], centroids[cluster]) for idx in indices])]
+     #  ax3.scatter(tsne_3d_results[closest_point_index, 0], tsne_3d_results[closest_point_index, 1],
+     #               tsne_3d_results[closest_point_index, 2], s=600, color='black', alpha=1)
+
+#ax3.legend(fontsize=12)
 plt.show()
