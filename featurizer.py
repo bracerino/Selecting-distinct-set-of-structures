@@ -11,8 +11,8 @@ chem_info2 = {
     }
 }
 
-input_folder = Vacancies_2
-output_name_dictionary = dict_VACA_2.pkl
+input_folder = "Vacancies_2"
+output_name_dictionary = "dict_VACA_2.pkl"
 
 
 start_time = time.time()
