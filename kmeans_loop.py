@@ -147,6 +147,61 @@ while ikx < how_many_files_to_generate:
                     algorithm='lloyd',max_iter=600, n_init=num_clusters-round(0.5*num_clusters)).fit(fingerprints)
     labels = kmeans.labels_
     centroids = kmeans.cluster_centers_
+
+
+  
+    # ---------------- If you wish the find indecis of vectors which are farthers from each other instead of only selecting vectors which are closest to the centroids
+    """
+    cluster_points = {i: [] for i in range(len(centroids))}
+    cluster_indices = {i: [] for i in range(len(centroids))}
+    
+    for idx, cluster in enumerate(labels):
+        cluster_points[cluster].append(fingerprints[idx])  
+        cluster_indices[cluster].append(idx) 
+    for i in range(len(centroids)):
+        cluster_points[i] = np.array(cluster_points[i])
+        cluster_indices[i] = np.array(cluster_indices[i])
+    
+    # Step 3: Find the farthest point from each centroid
+    selected_indices = []
+    
+    for cluster_id in range(len(centroids)):
+        points = cluster_points[cluster_id]
+        indices = cluster_indices[cluster_id]
+    
+        # Find the farthest point from the centroid
+        farthest_idx = np.argmax([euclidean(point, centroids[cluster_id]) for point in points])
+        selected_indices.append(indices[farthest_idx])  # Store the original index
+    
+    # Step 4: Iterate over possible selections to maximize distance
+    best_combination = selected_indices
+    max_distance = sum(euclidean(fingerprints[i], fingerprints[j]) for i, j in combinations(selected_indices, 2))
+    
+    # Step 5: Try alternative selections for maximal distance
+    for candidates in zip(*cluster_indices.values()):  # Iterate over possible selections
+        total_distance = sum(euclidean(fingerprints[i], fingerprints[j]) for i, j in combinations(candidates, 2))
+        if total_distance > max_distance:
+            best_combination = candidates
+            max_distance = total_distance
+    
+    for vall in best_combination:
+        print(vall)
+        selected_structure_name = names[vall]
+        print(selected_structure_name)
+        selected_structures[selected_structure_name] = database[selected_structure_name]
+        selected_fingerprints.append(fingerprints[vall])
+    
+    #Uncomment the section above and comment the section below if you wish to find farthers vectors (one from each cluster) instead of selecting only vectors that are each closest to the centroid.
+    #Do not forget to also uncomment corresponding part in the plotting of tnse (ax2.scatter(tsne_results[best_combination, 0], tsne_results[best_combination, 1], s=300,color='black', alpha=0.5))
+    for vall in best_combination:
+        print(vall)
+        selected_structure_name = names[vall]
+        print(selected_structure_name)
+        selected_structures[selected_structure_name] = database[selected_structure_name]
+        selected_fingerprints.append(fingerprints[vall])
+
+#Uncomment the section above and comment the section below if you wish to find farthers vectors (one from each cluster) instead of selecting only vectors that are each closest to the centroid.
+"""  
     # Select structures closest to each cluster centroid
     selected_structures = {}
     selected_fingerprints = []
@@ -160,7 +215,11 @@ while ikx < how_many_files_to_generate:
             selected_structure_name = names[closest_point_index]
             selected_structures[selected_structure_name] = database[selected_structure_name]
             selected_fingerprints.append(fingerprints[closest_point_index])
+    #---------------------------------------------------------------------------
 
+
+
+      
         # Write sorted names of selected structures to a file
         sorted_structure_names = sorted(selected_structures, key=extract_number)
         with open('selected_structure_names_PCA_{}.txt'.format(ikx), 'w') as file:
